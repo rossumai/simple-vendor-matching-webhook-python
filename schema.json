@@ -1,0 +1,80 @@
+[
+  {
+    "category": "section",
+    "children": [
+      {
+        "category": "datapoint",
+        "constraints": {
+          "required": false
+        },
+        "default_value": null,
+        "id": "invoice_id",
+        "label": "Invoice number",
+        "rir_field_names": [
+          "invoice_id"
+        ],
+        "type": "string",
+        "width_chars": 10
+      },
+      {
+        "category": "datapoint",
+        "constraints": {
+          "required": false
+        },
+        "default_value": null,
+        "id": "order_id",
+        "label": "Order ID",
+        "rir_field_names": [
+          "order_id"
+        ],
+        "type": "string",
+        "width_chars": 10
+      },
+      {
+        "category": "datapoint",
+        "constraints": {
+          "required": true
+        },
+        "default_value": null,
+        "id": "vendor_name",
+        "label": "Vendor name",
+        "rir_field_names": [
+          "sender_name"
+        ],
+        "type": "string",
+        "width_chars": 10
+      },
+      {
+        "category": "datapoint",
+        "constraints": {
+          "required": true
+        },
+        "default_value": null,
+        "id": "vendor",
+        "label": "Vendor",
+        "rir_field_names": [],
+        "type": "enum",
+	"options": [{"label": "---", "value": "---"}],
+        "width_chars": 10
+      },
+      {
+        "category": "datapoint",
+        "constraints": {
+          "required": false
+        },
+        "default_value": null,
+        "format": "# ##0.#",
+        "id": "amount_due",
+        "label": "Amount Due",
+        "rir_field_names": [
+          "amount_due", "amount_total"
+        ],
+        "type": "number",
+        "width_chars": 10
+      }
+    ],
+    "icon": null,
+    "id": "main_section",
+    "label": "Python Connector Example"
+  }
+]
