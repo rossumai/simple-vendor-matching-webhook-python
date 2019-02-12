@@ -43,16 +43,18 @@ def validate_order_id(messages, updated_datapoints, annotation_tree):
 
 
 def match_supplier(messages, updated_datapoints, annotation_tree, is_initial, previously_updated):
-    """ Supplier matching.
+    """
+    Supplier matching based on vendor name.
 
     How it works: vendor_name contains the name of the supplier to be matched.
     This pre-populates a vendor enum by (even partially) matching suppliers
     in our "database", to let the user make a final pick in case of ambiguity.
-    This enum maps the name from
+    This enum maps the name to a vendor id that is part of the exported data.
 
     In case no vendor is matched by this name, "---" is pre-populated in the
     enum and an error is displayed.
     """
+    # Just an example.  Load from file, or look up in an SQL database.
     SUPPLIERS = [
         ('Roboyo', 1),
         ('Rossum', 2),
@@ -71,6 +73,9 @@ def match_supplier(messages, updated_datapoints, annotation_tree, is_initial, pr
         return
 
     # Here, you would more typically perform an SQL database lookup.
+    # We match by any substring. Other common variations:
+    # - match only by prefix
+    # - reverse prefix match (e.g. match "Rossum Ltd." to supplier "Rossum")
     matched_vendors = [(vendor, id)
                        for vendor, id in SUPPLIERS
                        if vendor_name_norm != '' and vendor_name_norm in normalize_name(vendor)]
