@@ -5,6 +5,8 @@ This example connector:
   * Warns if order id is not in a particular (six digit) format
   * Matches vendor against a vendor list (toy list containing vendors "Roboyo", "Rossum", "Volvo")
 
+![Vendor matching demo](vendordemo.gif)
+
 To run it:
 ```
 	python3 connector.py
