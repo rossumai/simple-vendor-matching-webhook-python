@@ -19,6 +19,8 @@ Create the connector first:
 ```
 	 elisctl connector create "Python Example Connector" --service-url http://hostname:5000 --auth-token wuNg0OenyaeK4eenOovi7aiF
 ```
+The `--auth-token` will create the secret token that Rossum checks before sending the data to the connector to avoid data leakage.
+The value should be stored in the `CONNECTOR_SECRET_KEY` environment variable in the environment where this connector will be running.
 
 In the response, you will receive the ID of the connector. Next, choose an existing queue and deploy the connector to it:
 
@@ -36,3 +38,5 @@ You can also [configure the connector using our API](https://api.elis.rossum.ai/
 
 To use this for production, use via HTTPS and enforce the authentication token.
 Customize schema.json to taste.
+
+For more information on how to run a connector, check out our [Developer Hub connector guide](https://developers.rossum.ai/docs/your-first-connector).

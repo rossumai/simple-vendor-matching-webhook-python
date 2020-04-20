@@ -1,18 +1,27 @@
-"""
-An example Python connector implemented using Flask.
-
-TODO: Authentication token verification. (With the current implementation,
-anyone on the internet could impersonate Elis to leak data from the
-connector!)
-"""
-
+"""An example Python connector implemented using Flask."""
+import hmac
+import os
 import re
+from functools import wraps
 
 import flask
 from flask import request, jsonify
+from werkzeug.exceptions import Unauthorized
 
 app = flask.Flask(__name__)
 # app.config["DEBUG"] = True
+
+
+def auth_required(f):
+    @wraps(f)
+    def authorize_request(*args, **kwargs):
+        expected_header = f"secret_key {os.environ['CONNECTOR_SECRET_KEY']}"
+        authorized = hmac.compare_digest(request.headers.get("Authorization", ""), expected_header)
+        if not authorized:
+            raise Unauthorized("Invalid authorization header.")
+        return f(*args, **kwargs)
+
+    return authorize_request
 
 
 def find_by_schema_id(annotation_tree, schema_id):
@@ -92,6 +101,7 @@ def match_supplier(messages, updated_datapoints, annotation_tree, is_initial, pr
 
 
 @app.route('/validate', methods=['POST'])
+@auth_required
 def api_validate():
     annotation_tree = request.json['content']
     previously_updated = request.json['meta']['updated_datapoint_ids']
