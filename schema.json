@@ -36,7 +36,7 @@
           "required": true
         },
         "default_value": null,
-        "id": "vendor_name",
+        "id": "sender_name",
         "label": "Vendor name",
         "rir_field_names": [
           "sender_name"
@@ -47,10 +47,10 @@
       {
         "category": "datapoint",
         "constraints": {
-          "required": true
+          "required": false
         },
         "default_value": null,
-        "id": "vendor",
+        "id": "sender_match",
         "label": "Vendor",
         "rir_field_names": [],
         "type": "enum",

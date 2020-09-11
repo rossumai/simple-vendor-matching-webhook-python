@@ -92,8 +92,8 @@ def match_vendor(messages: List, operations: List, annotation_tree: List, update
         name = re.sub(r"[,.\s]", "", name)
         return name.lower()
 
-    vendor = find_by_schema_id(annotation_tree, "vendor")
-    vendor_name = find_by_schema_id(annotation_tree, "vendor_name")
+    vendor = find_by_schema_id(annotation_tree, "sender_match")
+    vendor_name = find_by_schema_id(annotation_tree, "sender_name")
     vendor_name_norm = normalize_name(vendor_name["content"]["value"])
 
     # Do not update the list unless we have a reason.
@@ -112,7 +112,7 @@ def match_vendor(messages: List, operations: List, annotation_tree: List, update
         vendor_options = [{"value": id, "label": vendor} for vendor, id in matched_vendors]
     else:
         vendor_options = [{"value": "---", "label": "---"}]
-        messages.append({"id": vendor_name["id"], "type": "error", "content": "Vendor not found."})
+        messages.append({"id": vendor["id"], "type": "error", "content": "Vendor not found."})
 
     operations.append(
         {
