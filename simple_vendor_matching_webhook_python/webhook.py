@@ -5,15 +5,10 @@ import re
 from functools import wraps
 from typing import List
 
-import flask
 from flask import request, jsonify
 from werkzeug.exceptions import abort
 
-app = flask.Flask(__name__)
-# app.config["DEBUG"] = True
-
-
-SECRET_KEY = "Your secret key stored in hook.config.secret"  # never store this in code
+from simple_vendor_matching_webhook_python.config import SECRET_KEY
 
 
 def hmac_signature_required(f):
@@ -50,28 +45,35 @@ def normalize_invoice_id(operations: List, annotation_tree: List):
     invoice_id_norm = re.sub(r"[^0-9]", "", invoice_id["content"]["value"])
     if invoice_id_norm != invoice_id["content"]["value"]:
         operations.append(
-            {"op": "replace",
-             "id": invoice_id["id"],
-             "value": {
-                 "content": {
-                     "value": invoice_id_norm,
-                     "validation_sources": ["connector"],
-                 },
-             }
-             }
+            {
+                "op": "replace",
+                "id": invoice_id["id"],
+                "value": {
+                    "content": {"value": invoice_id_norm, "validation_sources": ["connector"]}
+                },
+            }
         )
 
 
 def validate_order_id(messages: List, annotation_tree: List):
     """ Show a warning in case order id is not in a six digit format. """
     order_id = find_by_schema_id(annotation_tree, "order_id")
-    if order_id["content"]["value"] != "" and not re.match(r"^[0-9]{6}$", order_id["content"]["value"]):
-        messages.append({"id": order_id["id"], "type": "warning", "content": "Invalid order_id format."})
+    if order_id["content"]["value"] != "" and not re.match(
+        r"^[0-9]{6}$", order_id["content"]["value"]
+    ):
+        messages.append(
+            {"id": order_id["id"], "type": "warning", "content": "Invalid order_id format."}
+        )
 
 
-def match_vendor(messages: List, operations: List, annotation_tree: List, updated_datapoints: List[int], action: str):
+def match_vendor(
+    messages: List,
+    operations: List,
+    annotation_tree: List,
+    updated_datapoints: List[int],
+    action: str,
+):
     """Vendor matching based on vendor name.
-
     How it works: vendor_name contains the name of the vendor to be matched.
     This pre-populates a vendor enum by (even partially) matching vendors
     in the "database", to let the user make a final pick in case of ambiguity.
@@ -82,11 +84,7 @@ def match_vendor(messages: List, operations: List, annotation_tree: List, update
     """
 
     # Just an example.  Load from file, or look up in an SQL database.
-    suppliers = [
-        ("Roboyo", 1),
-        ("Rossum", 2),
-        ("Volvo", 3),
-    ]
+    suppliers = [("Roboyo", 1), ("Rossum", 2), ("Volvo", 3)]
 
     def normalize_name(name):
         name = re.sub(r"[,.\s]", "", name)
@@ -104,12 +102,14 @@ def match_vendor(messages: List, operations: List, annotation_tree: List, update
     # We match by any substring. Other common variations:
     # - match only by prefix
     # - reverse prefix match (e.g. match "Rossum Ltd." to supplier "Rossum")
-    matched_vendors = [(vendor, id)
-                       for vendor, id in suppliers
-                       if vendor_name_norm != "" and vendor_name_norm in normalize_name(vendor)]
+    matched_vendors = [
+        (vendor, id_)
+        for vendor, id_ in suppliers
+        if vendor_name_norm != "" and vendor_name_norm in normalize_name(vendor)
+    ]
 
     if matched_vendors:
-        vendor_options = [{"value": id, "label": vendor} for vendor, id in matched_vendors]
+        vendor_options = [{"value": id_, "label": vendor} for vendor, id_ in matched_vendors]
     else:
         vendor_options = [{"value": "---", "label": "---"}]
         messages.append({"id": vendor_name["id"], "type": "error", "content": "Vendor not found."})
@@ -127,7 +127,6 @@ def match_vendor(messages: List, operations: List, annotation_tree: List, update
     )
 
 
-@app.route("/vendor_matching", methods=["POST"])
 @hmac_signature_required
 def vendor_matching():
     annotation_tree = request.json["annotation"]["content"]
@@ -141,7 +140,3 @@ def vendor_matching():
     match_vendor(messages, operations, annotation_tree, updated_datapoints, action)
 
     return jsonify({"messages": messages, "operations": operations})
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
